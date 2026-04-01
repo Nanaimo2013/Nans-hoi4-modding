@@ -1,0 +1,89 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         NAN'S HOI4 TOOL  ·  DESIGN TOKENS  ·  v2
+         Surface, accent, semantic, typography, spacing, radii, shadows
+    ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- ── Surfaces ─────────────────────────────────────────────────────── -->
+    <Color x:Key="Tok.Bg.Canvas">#0D0E14</Color>
+    <Color x:Key="Tok.Bg.Surface">#13141C</Color>
+    <Color x:Key="Tok.Bg.Raised">#1A1C27</Color>
+    <Color x:Key="Tok.Bg.Overlay">#21233A</Color>
+    <Color x:Key="Tok.Bg.Hover">#25273D</Color>
+
+    <SolidColorBrush x:Key="Tok.Brush.Canvas"   Color="{StaticResource Tok.Bg.Canvas}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Surface"  Color="{StaticResource Tok.Bg.Surface}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Raised"   Color="{StaticResource Tok.Bg.Raised}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Overlay"  Color="{StaticResource Tok.Bg.Overlay}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Hover"    Color="{StaticResource Tok.Bg.Hover}"/>
+
+    <!-- ── Borders ──────────────────────────────────────────────────────── -->
+    <Color x:Key="Tok.Border.Subtle">#20222F</Color>
+    <Color x:Key="Tok.Border.Default">#2C2F43</Color>
+    <Color x:Key="Tok.Border.Strong">#404463</Color>
+
+    <SolidColorBrush x:Key="Tok.Brush.Border.Subtle"  Color="{StaticResource Tok.Border.Subtle}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Border.Default" Color="{StaticResource Tok.Border.Default}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Border.Strong"  Color="{StaticResource Tok.Border.Strong}"/>
+
+    <!-- ── Accent (blue → indigo) ────────────────────────────────────────── -->
+    <Color x:Key="Tok.Accent.100">#E3E8FF</Color>
+    <Color x:Key="Tok.Accent.300">#818CF8</Color>
+    <Color x:Key="Tok.Accent.400">#6366F1</Color>
+    <Color x:Key="Tok.Accent.500">#4F46E5</Color>
+    <Color x:Key="Tok.Accent.600">#4338CA</Color>
+    <Color x:Key="Tok.Accent.700">#3730A3</Color>
+    <Color x:Key="Tok.Accent.Glow">#334F46E5</Color>
+
+    <SolidColorBrush x:Key="Tok.Brush.Accent"      Color="{StaticResource Tok.Accent.400}"/>
+    <SolidColorBrush x:Key="Tok.Brush.AccentDark"  Color="{StaticResource Tok.Accent.600}"/>
+    <SolidColorBrush x:Key="Tok.Brush.AccentLight" Color="{StaticResource Tok.Accent.300}"/>
+    <SolidColorBrush x:Key="Tok.Brush.AccentGlow"  Color="{StaticResource Tok.Accent.Glow}"/>
+
+    <!-- ── Text ─────────────────────────────────────────────────────────── -->
+    <Color x:Key="Tok.Text.Primary">#F0F1F8</Color>
+    <Color x:Key="Tok.Text.Secondary">#9CA3BA</Color>
+    <Color x:Key="Tok.Text.Muted">#5C607A</Color>
+    <Color x:Key="Tok.Text.Disabled">#383B52</Color>
+    <Color x:Key="Tok.Text.OnAccent">#FFFFFF</Color>
+
+    <SolidColorBrush x:Key="Tok.Brush.Text.Primary"   Color="{StaticResource Tok.Text.Primary}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Text.Secondary" Color="{StaticResource Tok.Text.Secondary}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Text.Muted"     Color="{StaticResource Tok.Text.Muted}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Text.OnAccent"  Color="{StaticResource Tok.Text.OnAccent}"/>
+
+    <!-- ── Semantic ─────────────────────────────────────────────────────── -->
+    <Color x:Key="Tok.Success">#22C55E</Color>
+    <Color x:Key="Tok.Warning">#F59E0B</Color>
+    <Color x:Key="Tok.Error">#EF4444</Color>
+    <Color x:Key="Tok.Info">#3B82F6</Color>
+
+    <SolidColorBrush x:Key="Tok.Brush.Success" Color="{StaticResource Tok.Success}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Warning" Color="{StaticResource Tok.Warning}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Error"   Color="{StaticResource Tok.Error}"/>
+    <SolidColorBrush x:Key="Tok.Brush.Info"    Color="{StaticResource Tok.Info}"/>
+
+    <!-- ── Online / presence ────────────────────────────────────────────── -->
+    <SolidColorBrush x:Key="Tok.Brush.Online"  Color="#22C55E"/>
+    <SolidColorBrush x:Key="Tok.Brush.Away"    Color="#F59E0B"/>
+    <SolidColorBrush x:Key="Tok.Brush.Offline" Color="#6B7280"/>
+
+    <!-- ── Radii (CornerRadius) ──────────────────────────────────────────── -->
+    <CornerRadius x:Key="Tok.Radius.Sm">4</CornerRadius>
+    <CornerRadius x:Key="Tok.Radius.Md">8</CornerRadius>
+    <CornerRadius x:Key="Tok.Radius.Lg">12</CornerRadius>
+    <CornerRadius x:Key="Tok.Radius.Xl">16</CornerRadius>
+    <CornerRadius x:Key="Tok.Radius.Full">999</CornerRadius>
+
+    <!-- ── Font sizes ────────────────────────────────────────────────────── -->
+    <system:Double x:Key="Tok.Font.Xs"  xmlns:system="clr-namespace:System;assembly=mscorlib">10</system:Double>
+    <system:Double x:Key="Tok.Font.Sm"  xmlns:system="clr-namespace:System;assembly=mscorlib">11</system:Double>
+    <system:Double x:Key="Tok.Font.Md"  xmlns:system="clr-namespace:System;assembly=mscorlib">13</system:Double>
+    <system:Double x:Key="Tok.Font.Lg"  xmlns:system="clr-namespace:System;assembly=mscorlib">16</system:Double>
+    <system:Double x:Key="Tok.Font.Xl"  xmlns:system="clr-namespace:System;assembly=mscorlib">20</system:Double>
+    <system:Double x:Key="Tok.Font.2Xl" xmlns:system="clr-namespace:System;assembly=mscorlib">26</system:Double>
+    <system:Double x:Key="Tok.Font.3Xl" xmlns:system="clr-namespace:System;assembly=mscorlib">32</system:Double>
+
+</ResourceDictionary>

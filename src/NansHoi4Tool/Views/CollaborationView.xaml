@@ -1,0 +1,336 @@
+<UserControl x:Class="NansHoi4Tool.Views.CollaborationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:NansHoi4Tool.Helpers"
+             mc:Ignorable="d" d:DesignHeight="760" d:DesignWidth="1100"
+             Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <helpers:BoolToVisibilityConverter x:Key="InvBoolToVis" Invert="True"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="380"/>
+            <ColumnDefinition Width="1"/>
+            <ColumnDefinition Width="340"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══════════ LEFT — Setup / Session panel ═══════════ -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="36,32,36,32">
+
+                <!-- Page header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <materialDesign:PackIcon Kind="AccountMultiple" Width="28" Height="28"
+                                             Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                             VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBlock Style="{StaticResource HeadingLg}" Text="LAN Collaboration" Margin="0"/>
+                </StackPanel>
+                <TextBlock Style="{StaticResource Caption}"
+                           Text="Host a session or join a friend's — no project file needed for guests."
+                           Margin="0,0,0,28"/>
+
+                <!-- ── Connected banner ──────────────────────────────────── -->
+                <Border Style="{StaticResource AppCard}" Padding="20" Margin="0,0,0,16"
+                        Visibility="{Binding IsConnected, Converter={StaticResource BoolToVis}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <Ellipse Style="{StaticResource PresenceDot}" Margin="0,0,10,0"/>
+                                <TextBlock FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="Connected as Guest"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsHosting}" Value="True">
+                                                    <Setter Property="Text" Value="Hosting Session"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBlock Text="{Binding SessionName}" FontSize="12" Opacity="0.55"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                       Margin="18,0,0,4"/>
+                            <TextBlock Text="{Binding ConnectionStatus}" FontSize="11" Opacity="0.4"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                       Margin="18,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                            <!-- Push snapshot (host only) -->
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    materialDesign:ButtonAssist.CornerRadius="6"
+                                    Command="{Binding PushSnapshotCommand}"
+                                    Padding="10,6" Margin="0,0,8,0" Height="34"
+                                    Visibility="{Binding IsHosting, Converter={StaticResource BoolToVis}}"
+                                    ToolTip="Push latest project to all guests">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="CloudUpload" Width="14" Height="14"
+                                                             VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Sync" FontSize="12" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    materialDesign:ButtonAssist.CornerRadius="6"
+                                    Command="{Binding DisconnectCommand}"
+                                    Foreground="#EF4444" BorderBrush="#EF4444"
+                                    Padding="12,6" Height="34">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Logout" Width="14" Height="14"
+                                                             VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Leave" FontSize="12" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- ── Disconnected: Host card ───────────────────────────── -->
+                <Border Style="{StaticResource AppCard}" Padding="24" Margin="0,0,0,16"
+                        Visibility="{Binding IsConnected, Converter={StaticResource InvBoolToVis}}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <Border Style="{StaticResource PillAccent}" Margin="0,0,10,0">
+                                <TextBlock Text="HOST" FontSize="9" FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            </Border>
+                            <TextBlock Text="Host a Session" Style="{StaticResource HeadingSm}" Margin="0"/>
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,14"
+                                   Text="Start a server on your machine. Guests connect via your local IP — no project file needed on their end."/>
+
+                        <!-- Your IP display -->
+                        <Border Background="#0AFFFFFF" BorderBrush="#14FFFFFF" BorderThickness="1"
+                                CornerRadius="6" Padding="12,8" Margin="0,0,0,16">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Lan" Width="14" Height="14"
+                                                         Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                                         VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock VerticalAlignment="Center" FontSize="12"
+                                           Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}">
+                                    <Run Text="Your IP: "/>
+                                    <Run Text="{Binding LocalIp}" FontWeight="SemiBold"/>
+                                    <Run Text=" : 51420"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <Button Style="{StaticResource GlowButton}"
+                                Command="{Binding HostSessionCommand}"
+                                HorizontalAlignment="Left" Padding="22,10">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ServerNetwork" Width="16" Height="16"
+                                                         VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="Start Hosting" FontSize="13" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Disconnected: Join card ───────────────────────────── -->
+                <Border Style="{StaticResource AppCard}" Padding="24"
+                        Visibility="{Binding IsConnected, Converter={StaticResource InvBoolToVis}}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <Border Style="{StaticResource PillSuccess}" Margin="0,0,10,0">
+                                <TextBlock Text="JOIN" FontSize="9" FontWeight="Bold"
+                                           Foreground="#22C55E"/>
+                            </Border>
+                            <TextBlock Text="Join a Session" Style="{StaticResource HeadingSm}" Margin="0"/>
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,16"
+                                   Text="Enter the host's local IP address. The project will be sent to you automatically — you don't need your own project file."/>
+
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="90"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     materialDesign:HintAssist.Hint="Host IP address"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding HostAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox Grid.Column="2"
+                                     materialDesign:HintAssist.Hint="Port"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding HostPort, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+
+                        <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                                materialDesign:ButtonAssist.CornerRadius="8"
+                                Command="{Binding JoinSessionCommand}"
+                                HorizontalAlignment="Left" Padding="22,10">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="AccountArrowRight" Width="16" Height="16"
+                                                         VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="Connect" FontSize="13" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Divider -->
+        <Border Grid.Column="1" Background="#1AFFFFFF"/>
+
+        <!-- ═══════════ RIGHT — Collaborators + Chat ════════════ -->
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="160"/>
+                <RowDefinition Height="1"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Collaborators header -->
+            <Border Grid.Row="0" Padding="16,12" Background="#0DFFFFFF">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="AccountGroup" Width="16" Height="16"
+                                             Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="Participants" Style="{StaticResource SectionLabel}"
+                               Margin="0" VerticalAlignment="Center"/>
+                    <Border Style="{StaticResource PillAccent}" Margin="8,0,0,0" Padding="6,2">
+                        <TextBlock Text="{Binding Collaborators.Count}" FontSize="10"
+                                   Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Collaborators list -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Collaborators}" Margin="12,8">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#08FFFFFF" BorderBrush="#0EFFFFFF" BorderThickness="1"
+                                    CornerRadius="8" Padding="10,8" Margin="0,3">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse Grid.Column="0" Style="{StaticResource PresenceDot}" Margin="0,0,10,0"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding DisplayName}" FontSize="12" FontWeight="Medium"
+                                                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                        <TextBlock Text="{Binding Role}" FontSize="10" Opacity="0.5"
+                                                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                    </StackPanel>
+                                    <Border Grid.Column="2" Style="{StaticResource PillAccent}" Padding="6,2"
+                                            Visibility="{Binding IsHost, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock Text="HOST" FontSize="9" FontWeight="Bold"
+                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Divider -->
+            <Border Grid.Row="2" Background="#1AFFFFFF"/>
+
+            <!-- Chat messages -->
+            <ScrollViewer Grid.Row="3" x:Name="ChatScroll" VerticalScrollBarVisibility="Auto"
+                          Padding="12,8">
+                <ItemsControl ItemsSource="{Binding ChatMessages}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,4">
+                                <!-- Timestamp + name -->
+                                <TextBlock FontSize="10" Opacity="0.4" Margin="4,0,4,2"
+                                           Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsOwn}" Value="True">
+                                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                    <Run Text="{Binding DisplayName}"/>
+                                    <Run Text=" ·"/>
+                                    <Run Text="{Binding Timestamp}"/>
+                                </TextBlock>
+                                <!-- Bubble -->
+                                <Border>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background"         Value="#21233A"/>
+                                            <Setter Property="BorderBrush"        Value="#2C2F43"/>
+                                            <Setter Property="BorderThickness"    Value="1"/>
+                                            <Setter Property="CornerRadius"       Value="12,12,12,2"/>
+                                            <Setter Property="Padding"            Value="10,6"/>
+                                            <Setter Property="MaxWidth"           Value="280"/>
+                                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsOwn}" Value="True">
+                                                    <Setter Property="Background"         Value="#6366F1"/>
+                                                    <Setter Property="BorderThickness"    Value="0"/>
+                                                    <Setter Property="CornerRadius"       Value="12,12,2,12"/>
+                                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding Text}" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="White"/>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Chat input -->
+            <Border Grid.Row="4" Padding="10" Background="#08FFFFFF"
+                    BorderBrush="#0EFFFFFF" BorderThickness="0,1,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0"
+                             materialDesign:HintAssist.Hint="Message…"
+                             materialDesign:HintAssist.IsFloating="False"
+                             Style="{StaticResource MaterialDesignFilledTextBox}"
+                             Text="{Binding ChatInput, UpdateSourceTrigger=PropertyChanged}"
+                             IsEnabled="{Binding IsConnected}"
+                             FontSize="12">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Return" Command="{Binding SendChatCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button Grid.Column="2" Style="{StaticResource MaterialDesignIconButton}"
+                            Command="{Binding SendChatCommand}"
+                            IsEnabled="{Binding IsConnected}"
+                            ToolTip="Send (Enter)">
+                        <materialDesign:PackIcon Kind="SendVariant" Width="18" Height="18"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

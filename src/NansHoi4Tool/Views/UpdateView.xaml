@@ -1,0 +1,161 @@
+<UserControl x:Class="NansHoi4Tool.Views.UpdateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:NansHoi4Tool.Helpers"
+             mc:Ignorable="d" d:DesignHeight="520" d:DesignWidth="560"
+             Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <helpers:BoolToVisibilityConverter x:Key="InvBoolToVis" Invert="True"/>
+    </UserControl.Resources>
+
+    <Border Background="#0F1016" CornerRadius="14" BorderBrush="#2C2F43" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="32" ShadowDepth="8" Opacity="0.5" Color="#000000" Direction="270"/>
+        </Border.Effect>
+
+        <Grid>
+            <!-- Indigo glow at top -->
+            <Ellipse Width="320" Height="180" HorizontalAlignment="Center" VerticalAlignment="Top"
+                     Margin="0,-60,0,0" Opacity="0.07">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#6366F1" Offset="0"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+
+            <StackPanel Margin="36,32,36,32">
+
+                <!-- Header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                    <Border Width="42" Height="42" CornerRadius="10" Background="#1A1C27"
+                            BorderBrush="#2C2F43" BorderThickness="1" Margin="0,0,14,0">
+                        <materialDesign:PackIcon Kind="CloudDownloadOutline" Width="22" Height="22"
+                                                 Foreground="#6366F1" HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Software Update" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="White"/>
+                        <TextBlock Text="{Binding StatusText}" FontSize="12" Opacity="0.5"
+                                   Foreground="White" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Checking spinner -->
+                <StackPanel HorizontalAlignment="Center" Margin="0,20,0,20"
+                            Visibility="{Binding IsCheckingUpdate, Converter={StaticResource BoolToVis}}">
+                    <materialDesign:PackIcon Kind="Loading" Width="36" Height="36"
+                                             Foreground="#6366F1" HorizontalAlignment="Center">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <RotateTransform/>
+                        </materialDesign:PackIcon.RenderTransform>
+                        <materialDesign:PackIcon.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.Angle"
+                                                         From="0" To="360" Duration="0:0:1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </materialDesign:PackIcon.Triggers>
+                    </materialDesign:PackIcon>
+                    <TextBlock Text="Checking for updates…" FontSize="13" Opacity="0.5"
+                               Foreground="White" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+                </StackPanel>
+
+                <!-- Update available card -->
+                <Border Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVis}}"
+                        Style="{StaticResource AppCard}" Padding="20" Margin="0,0,0,20">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding LatestVersion, StringFormat='Version {0}'}"
+                                           FontSize="17" FontWeight="SemiBold" Foreground="White"/>
+                                <TextBlock Text="{Binding PublishedAt, StringFormat='Released {0}'}"
+                                           FontSize="11" Opacity="0.45" Foreground="White" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Style="{StaticResource PillSuccess}" Padding="10,4">
+                                <TextBlock Text="NEW" FontSize="10" FontWeight="Bold" Foreground="#22C55E"/>
+                            </Border>
+                        </Grid>
+                        <Border Height="1" Background="#1AFFFFFF" Margin="0,0,0,12"/>
+                        <TextBlock Text="Release Notes" Style="{StaticResource SectionLabel}" Margin="0,0,0,6"/>
+                        <ScrollViewer MaxHeight="140" VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="{Binding ReleaseNotes}" FontSize="12" Opacity="0.7"
+                                       Foreground="White" TextWrapping="Wrap"/>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
+                <!-- Up to date card -->
+                <Border Padding="20" Margin="0,0,0,20" Style="{StaticResource AppCard}">
+                    <Border.Visibility>
+                        <Binding Path="UpdateAvailable" Converter="{StaticResource InvBoolToVis}"/>
+                    </Border.Visibility>
+                    <StackPanel HorizontalAlignment="Center">
+                        <materialDesign:PackIcon Kind="CheckCircleOutline" Width="44" Height="44"
+                                                 Foreground="#22C55E" HorizontalAlignment="Center"/>
+                        <TextBlock Text="You're on the latest version" FontSize="14" Opacity="0.6"
+                                   Foreground="White" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Download progress -->
+                <StackPanel Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}"
+                            Margin="0,0,0,16">
+                    <Grid Margin="0,0,0,6">
+                        <TextBlock Text="Downloading update…" FontSize="12" Opacity="0.6" Foreground="White"/>
+                        <TextBlock Text="{Binding DownloadProgress, StringFormat='{}{0:F0}%'}"
+                                   FontSize="12" Opacity="0.6" Foreground="White" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <ProgressBar Value="{Binding DownloadProgress}" Minimum="0" Maximum="100"
+                                 Height="4" Foreground="#6366F1" Background="#20FFFFFF"/>
+                </StackPanel>
+
+                <!-- Action buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            materialDesign:ButtonAssist.CornerRadius="8"
+                            Foreground="#60FFFFFF" Padding="16,9" Margin="0,0,8,0"
+                            Command="{Binding RecheckCommand}"
+                            Visibility="{Binding IsDownloading, Converter={StaticResource InvBoolToVis}}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Refresh" Width="14" Height="14"
+                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="Recheck" VerticalAlignment="Center" FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            materialDesign:ButtonAssist.CornerRadius="8"
+                            Foreground="#EF4444" Padding="14,9" Margin="0,0,8,0"
+                            Command="{Binding CancelDownloadCommand}"
+                            Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}">Cancel</Button>
+                    <Button Style="{StaticResource GlowButton}"
+                            Padding="20,9"
+                            Command="{Binding DownloadAndInstallCommand}"
+                            IsEnabled="{Binding UpdateAvailable}"
+                            Visibility="{Binding IsDownloading, Converter={StaticResource InvBoolToVis}}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Download" Width="15" Height="15"
+                                                     VerticalAlignment="Center" Margin="0,0,7,0"/>
+                            <TextBlock Text="Download &amp; Install" VerticalAlignment="Center" FontSize="13"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

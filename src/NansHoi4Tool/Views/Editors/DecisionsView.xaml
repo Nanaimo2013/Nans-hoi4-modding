@@ -1,0 +1,234 @@
+<UserControl x:Class="NansHoi4Tool.Views.Editors.DecisionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="210"/>
+            <ColumnDefinition Width="210"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ── Col 0: Categories ── -->
+        <Border Grid.Column="0" Background="#0C0D12" BorderBrush="#14FFFFFF" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Padding="12,12,12,10" BorderBrush="#0EFFFFFF" BorderThickness="0,0,0,1">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="FolderOutline" Width="14" Height="14"
+                                                 Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                        <TextBlock Text="Categories" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Row="1" Padding="8,8,8,4">
+                    <Button Style="{StaticResource GlowButton}" Command="{Binding AddCategoryCommand}"
+                            HorizontalAlignment="Stretch" Padding="0,6">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <materialDesign:PackIcon Kind="Plus" Width="12" Height="12"
+                                                     VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="Add Category" VerticalAlignment="Center" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Categories}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="6,2" CornerRadius="6" Cursor="Hand" Padding="9,7">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.SelectedCategory.Name,
+                                                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    Value="{Binding Name}">
+                                                    <Setter Property="Background" Value="#1A6366F1"/>
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#0EFFFFFF"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Border.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick"
+                                                      Command="{Binding DataContext.SelectCategoryCommand,
+                                                                RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                      CommandParameter="{Binding}"/>
+                                    </Border.InputBindings>
+                                    <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="Medium"
+                                               Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- ── Col 1: Decisions ── -->
+        <Border Grid.Column="1" Background="#0A0B10" BorderBrush="#14FFFFFF" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Padding="12,12,12,10" BorderBrush="#0EFFFFFF" BorderThickness="0,0,0,1">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ClipboardList" Width="14" Height="14"
+                                                 Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                        <TextBlock Text="Decisions" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Row="1" Padding="8,8,8,4">
+                    <Button Style="{StaticResource GlowButton}" Command="{Binding AddDecisionCommand}"
+                            HorizontalAlignment="Stretch" Padding="0,6">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <materialDesign:PackIcon Kind="Plus" Width="12" Height="12"
+                                                     VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="Add Decision" VerticalAlignment="Center" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding SelectedCategory.Decisions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="6,2" CornerRadius="6" Cursor="Hand" Padding="9,7">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.SelectedDecision.Id,
+                                                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    Value="{Binding Id}">
+                                                    <Setter Property="Background" Value="#1A6366F1"/>
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#0EFFFFFF"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Border.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick"
+                                                      Command="{Binding DataContext.SelectDecisionCommand,
+                                                                RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                      CommandParameter="{Binding}"/>
+                                    </Border.InputBindings>
+                                    <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="Medium"
+                                               Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- ── Col 2: Decision Editor ── -->
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="22,18,22,22" DataContext="{Binding SelectedDecision}">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <StackPanel Margin="0,0,0,20">
+                    <TextBlock Text="{Binding Name}" Style="{StaticResource HeadingLg}"/>
+                    <TextBlock Text="Decision Properties" Style="{StaticResource Caption}"/>
+                </StackPanel>
+
+                <Border Style="{StaticResource AppCard}" Padding="18" Margin="0,0,0,12">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                            <materialDesign:PackIcon Kind="ClipboardEditOutline" Width="15" Height="15"
+                                                     Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                            <TextBlock Text="Core" Style="{StaticResource HeadingSm}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Decision ID" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="decision_id" materialDesign:HintAssist.IsFloating="False"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,10" Height="34" VerticalContentAlignment="Center"/>
+
+                        <TextBlock Text="Display Name" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="Decision Name" materialDesign:HintAssist.IsFloating="False"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,10" Height="34" VerticalContentAlignment="Center"/>
+
+                        <TextBlock Text="Description" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="Description text..."
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" Height="60" VerticalScrollBarVisibility="Auto"
+                                 TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="PP Cost" Style="{StaticResource InputLabel}"/>
+                                <TextBox materialDesign:HintAssist.Hint="0" materialDesign:HintAssist.IsFloating="False"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Text="{Binding CostPoliticalPower}"
+                                         Height="32" VerticalContentAlignment="Center" FontSize="11"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Days Re-do" Style="{StaticResource InputLabel}"/>
+                                <TextBox materialDesign:HintAssist.Hint="0" materialDesign:HintAssist.IsFloating="False"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Text="{Binding DaysReDo}"
+                                         Height="32" VerticalContentAlignment="Center" FontSize="11"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Days Remove" Style="{StaticResource InputLabel}"/>
+                                <TextBox materialDesign:HintAssist.Hint="0" materialDesign:HintAssist.IsFloating="False"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Text="{Binding DaysRemove}"
+                                         Height="32" VerticalContentAlignment="Center" FontSize="11"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="available = { … }" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="# trigger conditions"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Available, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" Height="56" VerticalScrollBarVisibility="Auto"
+                                 TextWrapping="Wrap" FontFamily="Consolas" FontSize="11"
+                                 Margin="0,0,0,12"/>
+
+                        <TextBlock Text="complete_effect = { … }" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="# effect script"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Effect, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" Height="56" VerticalScrollBarVisibility="Auto"
+                                 TextWrapping="Wrap" FontFamily="Consolas" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Company>Nan's Studios</Company>
+    <Authors>Nanaimo_2013</Authors>
+    <Copyright>Copyright © 2026 Nan's Studios by Nanaimo_2013</Copyright>
+    <Product>Nan's Hoi4 Tool</Product>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+</Project>

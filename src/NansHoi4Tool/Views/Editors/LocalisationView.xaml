@@ -1,0 +1,135 @@
+<UserControl x:Class="NansHoi4Tool.Views.Editors.LocalisationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" d:DesignHeight="700" d:DesignWidth="900"
+             Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="0" Background="#0F1018" BorderBrush="#14FFFFFF" BorderThickness="0,0,0,1" Padding="14,8">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Border Width="32" Height="32" CornerRadius="8" Background="#1A1C27"
+                            BorderBrush="#2C2F43" BorderThickness="1" Margin="0,0,12,0">
+                        <materialDesign:PackIcon Kind="Translate" Width="16" Height="16"
+                                                 Foreground="#6366F1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Localisation" Style="{StaticResource HeadingMd}"
+                               VerticalAlignment="Center" Margin="0,0,18,0"/>
+
+                    <Button Style="{StaticResource GlowButton}"
+                            Command="{Binding AddEntryCommand}"
+                            Padding="12,5" Margin="0,0,6,0" Height="30">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Plus" Width="13" Height="13"
+                                                     VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock Text="Add Entry" VerticalAlignment="Center" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource GhostIconBtn}"
+                            Command="{Binding ImportCommand}"
+                            Padding="11,5" Margin="0,0,5,0" Height="30">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Import" Width="13" Height="13"
+                                                     VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="Import" VerticalAlignment="Center" FontSize="11" Foreground="White"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource GhostIconBtn}"
+                            Command="{Binding ExportCommand}"
+                            Padding="11,5" Height="30">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Export" Width="13" Height="13"
+                                                     VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="Export" VerticalAlignment="Center" FontSize="11" Foreground="White"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <TextBox materialDesign:HintAssist.Hint="Search keys…"
+                         materialDesign:HintAssist.IsFloating="False"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         DockPanel.Dock="Right"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Width="230" Height="30" VerticalContentAlignment="Center" FontSize="12"/>
+            </DockPanel>
+        </Border>
+
+        <!-- DataGrid -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding FilteredEntries}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  HeadersVisibility="Column"
+                  SelectionMode="Single"
+                  Background="Transparent"
+                  RowBackground="Transparent"
+                  AlternatingRowBackground="#070810"
+                  BorderThickness="0"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="#0CFFFFFF"
+                  Foreground="White"
+                  FontSize="12"
+                  ColumnHeaderHeight="36">
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#0F1018"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Opacity" Value="0.5"/>
+                    <Setter Property="FontSize" Value="11"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Padding" Value="12,0"/>
+                    <Setter Property="BorderBrush" Value="#14FFFFFF"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#1A6366F1"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#0EFFFFFF"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Key" Binding="{Binding Key, UpdateSourceTrigger=PropertyChanged}"
+                                    Width="*" MinWidth="160"
+                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
+                <DataGridTextColumn Header="English" Binding="{Binding English, UpdateSourceTrigger=PropertyChanged}"
+                                    Width="2*"
+                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
+                <DataGridTextColumn Header="French" Binding="{Binding French, UpdateSourceTrigger=PropertyChanged}"
+                                    Width="2*"
+                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
+                <DataGridTextColumn Header="German" Binding="{Binding German, UpdateSourceTrigger=PropertyChanged}"
+                                    Width="2*"
+                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
+                <DataGridTemplateColumn Header="" Width="44" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource GhostIconBtn}"
+                                    Width="26" Height="26" Padding="0" Opacity="0.4"
+                                    Command="{Binding DataContext.DeleteEntryCommand,
+                                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    CommandParameter="{Binding}">
+                                <materialDesign:PackIcon Kind="DeleteOutline" Width="13" Height="13"
+                                                         Foreground="#EF4444"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

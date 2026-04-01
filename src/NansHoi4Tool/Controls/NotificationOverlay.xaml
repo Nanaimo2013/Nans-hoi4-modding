@@ -1,0 +1,123 @@
+<UserControl x:Class="NansHoi4Tool.Controls.NotificationOverlay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:NansHoi4Tool.Helpers"
+             IsHitTestVisible="True">
+
+    <UserControl.Resources>
+        <helpers:NotificationTypeToColorConverter x:Key="TypeToColor"/>
+        <helpers:NotificationTypeToIconConverter x:Key="TypeToIcon"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <helpers:BoolToVisibilityConverter x:Key="InvBoolToVis" Invert="True"/>
+    </UserControl.Resources>
+
+    <ItemsControl ItemsSource="{Binding ActiveNotifications}"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom"
+                  Margin="0,0,20,20">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Border Margin="0,6,0,0" CornerRadius="10" ClipToBounds="True"
+                        Background="#1A1C27" BorderBrush="#2C2F43" BorderThickness="1"
+                        MinWidth="300" MaxWidth="420">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" ShadowDepth="3" Opacity="0.4" Color="#000000" Direction="270"/>
+                    </Border.Effect>
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="SlideTransform"/>
+                    </Border.RenderTransform>
+                    <Border.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="SlideTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     From="130" To="0" Duration="0:0:0.3">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"/>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                     From="0" To="1" Duration="0:0:0.22"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Border.Triggers>
+
+                    <Grid>
+                        <!-- Left accent stripe -->
+                        <Border Width="4" HorizontalAlignment="Left"
+                                Background="{Binding Type, Converter={StaticResource TypeToColor}}"
+                                CornerRadius="10,0,0,10"/>
+
+                        <StackPanel Margin="16,10,10,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Icon -->
+                                <materialDesign:PackIcon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
+                                                         Kind="{Binding Type, Converter={StaticResource TypeToIcon}}"
+                                                         Foreground="{Binding Type, Converter={StaticResource TypeToColor}}"
+                                                         Width="18" Height="18"
+                                                         VerticalAlignment="Top" Margin="0,2,10,0"/>
+
+                                <!-- Title -->
+                                <TextBlock Grid.Column="1" Grid.Row="0"
+                                           Text="{Binding Title}"
+                                           FontWeight="SemiBold" FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                           Margin="0,0,0,2">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Title}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Body -->
+                                <TextBlock Grid.Column="1" Grid.Row="1"
+                                           Text="{Binding Message}"
+                                           FontSize="11" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                           Opacity="0.75"/>
+
+                                <!-- Dismiss -->
+                                <Button Grid.Column="2" Grid.Row="0"
+                                        Style="{StaticResource MaterialDesignIconButton}"
+                                        Width="20" Height="20" Padding="0"
+                                        VerticalAlignment="Top" Margin="6,0,0,0"
+                                        ToolTip="Dismiss"
+                                        Command="{Binding OnDismiss, Converter={x:Static helpers:ActionToCommandConverter.Instance}}">
+                                    <materialDesign:PackIcon Kind="Close" Width="11" Height="11" Opacity="0.45"/>
+                                </Button>
+                            </Grid>
+
+                            <!-- Progress bar (only shown when HasProgress) -->
+                            <ProgressBar Value="{Binding Progress}"
+                                         Minimum="0" Maximum="100"
+                                         Height="3" Margin="0,8,0,0"
+                                         Foreground="{Binding Type, Converter={StaticResource TypeToColor}}"
+                                         Background="#20FFFFFF"
+                                         Visibility="{Binding HasProgress, Converter={StaticResource BoolToVis}}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

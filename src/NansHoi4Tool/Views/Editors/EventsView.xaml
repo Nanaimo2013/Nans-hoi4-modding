@@ -1,0 +1,306 @@
+<UserControl x:Class="NansHoi4Tool.Views.Editors.EventsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ── Left: Event List ── -->
+        <Border Grid.Column="0" Background="#0C0D12" BorderBrush="#14FFFFFF" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0" Padding="14,14,14,10" BorderBrush="#0EFFFFFF" BorderThickness="0,0,0,1">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="CalendarText" Width="16" Height="16"
+                                                 Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Events" Style="{StaticResource HeadingMd}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Search + Add -->
+                <StackPanel Grid.Row="1" Margin="10,10,10,6">
+                    <TextBox materialDesign:HintAssist.Hint="Search events…"
+                             materialDesign:HintAssist.IsFloating="False"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             Height="32" Margin="0,0,0,6"/>
+                    <Button Style="{StaticResource GlowButton}"
+                            Command="{Binding AddEventCommand}"
+                            HorizontalAlignment="Stretch" Padding="0,7">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <materialDesign:PackIcon Kind="Plus" Width="13" Height="13"
+                                                     VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock Text="New Event" VerticalAlignment="Center" FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- List -->
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Events}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="8,2" CornerRadius="7" Cursor="Hand" Padding="10,8">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.SelectedEvent.Id,
+                                                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    Value="{Binding Id}">
+                                                    <Setter Property="Background" Value="#1A6366F1"/>
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#0EFFFFFF"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Border.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick"
+                                                      Command="{Binding DataContext.SelectEventCommand,
+                                                                RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                      CommandParameter="{Binding}"/>
+                                    </Border.InputBindings>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Id}" FontSize="12" FontWeight="Medium"
+                                                   Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Title}" FontSize="10" Opacity="0.45"
+                                                   Foreground="White" TextTrimming="CharacterEllipsis"
+                                                   Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- ── Right: Event Editor ── -->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24,20,24,24">
+
+                <!-- Empty state -->
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,80,0,0">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedEvent}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <materialDesign:PackIcon Kind="CalendarQuestion" Width="52" Height="52"
+                                             Opacity="0.1" HorizontalAlignment="Center" Foreground="White"/>
+                    <TextBlock Text="Select an event to edit" Opacity="0.25"
+                               HorizontalAlignment="Center" Margin="0,14,0,0" FontSize="14" Foreground="White"/>
+                </StackPanel>
+
+                <!-- Event editor -->
+                <StackPanel DataContext="{Binding SelectedEvent}">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+
+                    <!-- Header -->
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{Binding Id}" Style="{StaticResource HeadingLg}"/>
+                            <TextBlock Text="{Binding Type}" Style="{StaticResource Caption}"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Style="{StaticResource GhostIconBtn}"
+                                Padding="12,7" Opacity="0.6"
+                                Command="{Binding DataContext.DeleteEventCommand,
+                                          RelativeSource={RelativeSource AncestorType=StackPanel}}"
+                                CommandParameter="{Binding}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="DeleteOutline" Width="14" Height="14"
+                                                         Foreground="#EF4444" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Delete" Foreground="#EF4444" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- Core card -->
+                    <Border Style="{StaticResource AppCard}" Padding="18" Margin="0,0,0,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <materialDesign:PackIcon Kind="InformationOutline" Width="15" Height="15"
+                                                         Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Text="Core" Style="{StaticResource HeadingSm}"/>
+                            </StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Event ID" Style="{StaticResource InputLabel}"/>
+                                    <TextBox materialDesign:HintAssist.Hint="namespace.id" materialDesign:HintAssist.IsFloating="False"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                             Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                                             Height="34" VerticalContentAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Type" Style="{StaticResource InputLabel}"/>
+                                    <ComboBox Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                              SelectedItem="{Binding Type}" Height="34">
+                                        <ComboBoxItem Content="country_event"/>
+                                        <ComboBoxItem Content="news_event"/>
+                                        <ComboBoxItem Content="state_event"/>
+                                        <ComboBoxItem Content="unit_leader_event"/>
+                                        <ComboBoxItem Content="operative_leader_event"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="Title key" Style="{StaticResource InputLabel}"/>
+                            <TextBox materialDesign:HintAssist.Hint="event.id.title" materialDesign:HintAssist.IsFloating="False"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,10" Height="34" VerticalContentAlignment="Center"/>
+                            <TextBlock Text="Description key" Style="{StaticResource InputLabel}"/>
+                            <TextBox materialDesign:HintAssist.Hint="event.id.desc" materialDesign:HintAssist.IsFloating="False"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,10" Height="34" VerticalContentAlignment="Center"/>
+                            <TextBlock Text="Picture (GFX key)" Style="{StaticResource InputLabel}"/>
+                            <TextBox materialDesign:HintAssist.Hint="GFX_evt_picture" materialDesign:HintAssist.IsFloating="False"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding Picture, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12" Height="34" VerticalContentAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Content="Triggered only" IsChecked="{Binding IsTriggeredOnly}"
+                                          Style="{StaticResource MaterialDesignCheckBox}" Foreground="White" Margin="0,0,20,0"/>
+                                <CheckBox Content="Hidden" IsChecked="{Binding Hidden}"
+                                          Style="{StaticResource MaterialDesignCheckBox}" Foreground="White" Margin="0,0,20,0"/>
+                                <CheckBox Content="Fire only once" IsChecked="{Binding Fire_only_once}"
+                                          Style="{StaticResource MaterialDesignCheckBox}" Foreground="White"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Trigger card -->
+                    <Border Style="{StaticResource AppCard}" Padding="18" Margin="0,0,0,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Lightning" Width="15" Height="15"
+                                                         Foreground="#F59E0B" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Text="Trigger" Style="{StaticResource HeadingSm}"/>
+                            </StackPanel>
+                            <TextBox materialDesign:HintAssist.Hint="# HOI4 trigger conditions..."
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding Trigger, UpdateSourceTrigger=PropertyChanged}"
+                                     AcceptsReturn="True" Height="80"
+                                     VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                                     FontFamily="Consolas" FontSize="12"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Options card -->
+                    <Border Style="{StaticResource AppCard}" Padding="18" Margin="0,0,0,12">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="FormatListBulletedSquare" Width="15" Height="15"
+                                                             Foreground="#22C55E" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                    <TextBlock Text="Options" Style="{StaticResource HeadingSm}"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Style="{StaticResource GlowButton}"
+                                        Command="{Binding DataContext.AddOptionCommand,
+                                                  RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
+                                        Padding="12,5" Height="28">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Plus" Width="12" Height="12"
+                                                                 VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBlock Text="Add Option" VerticalAlignment="Center" FontSize="11"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                            <ItemsControl ItemsSource="{Binding Options}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,0,10" Padding="14" CornerRadius="8"
+                                                Background="#0A0B10" BorderBrush="#1AFFFFFF" BorderThickness="1">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid Grid.Row="0" Margin="0,0,0,8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBox Grid.Column="0"
+                                                             materialDesign:HintAssist.Hint="Option name key"
+                                                             materialDesign:HintAssist.IsFloating="False"
+                                                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                             Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                             Height="32" VerticalContentAlignment="Center"/>
+                                                    <Button Grid.Column="1" Style="{StaticResource GhostIconBtn}"
+                                                            Width="28" Height="28" Margin="6,0,0,0" Opacity="0.5"
+                                                            Command="{Binding DataContext.RemoveOptionCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            CommandParameter="{Binding}">
+                                                        <materialDesign:PackIcon Kind="DeleteOutline" Width="14" Height="14"
+                                                                                 Foreground="#EF4444"/>
+                                                    </Button>
+                                                </Grid>
+                                                <TextBox Grid.Row="1"
+                                                         materialDesign:HintAssist.Hint="Trigger (optional)"
+                                                         materialDesign:HintAssist.IsFloating="False"
+                                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                         Text="{Binding Trigger, UpdateSourceTrigger=PropertyChanged}"
+                                                         Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Row="2"
+                                                         materialDesign:HintAssist.Hint="Effect script…"
+                                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                         Text="{Binding Effect, UpdateSourceTrigger=PropertyChanged}"
+                                                         AcceptsReturn="True" Height="56"
+                                                         VerticalScrollBarVisibility="Auto"
+                                                         TextWrapping="Wrap" FontFamily="Consolas" FontSize="11"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

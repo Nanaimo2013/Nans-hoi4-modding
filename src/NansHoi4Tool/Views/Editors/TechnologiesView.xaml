@@ -1,0 +1,336 @@
+<UserControl x:Class="NansHoi4Tool.Views.Editors.TechnologiesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:NansHoi4Tool.Helpers"
+             mc:Ignorable="d" d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+
+    <UserControl.Resources>
+        <helpers:FocusGridConverter x:Key="GridConv"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ══ Toolbar ══════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                Background="#0F1018" BorderBrush="#14FFFFFF" BorderThickness="0,0,0,1" Padding="12,7">
+            <StackPanel Orientation="Horizontal">
+                <Border Width="32" Height="32" CornerRadius="8" Background="#1A1C27"
+                        BorderBrush="#2C2F43" BorderThickness="1" Margin="0,0,12,0">
+                    <materialDesign:PackIcon Kind="Microscope" Width="16" Height="16"
+                                             Foreground="#6366F1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="Technologies" Style="{StaticResource HeadingMd}"
+                           VerticalAlignment="Center" Margin="0,0,18,0"/>
+                <Button Style="{StaticResource GlowButton}"
+                        Command="{Binding AddTechCommand}"
+                        Padding="12,5" Margin="0,0,6,0" Height="30">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Plus" Width="13" Height="13"
+                                                 VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock Text="Add Tech" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource GhostIconBtn}"
+                        Command="{Binding DeleteTechCommand}"
+                        CommandParameter="{Binding SelectedTech}"
+                        Padding="11,5" Height="30" Opacity="0.7">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="DeleteOutline" Width="13" Height="13"
+                                                 Foreground="#EF4444" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock Text="Delete" Foreground="#EF4444" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- ── Canvas ── -->
+        <ScrollViewer x:Name="TechScrollViewer"
+                      Grid.Column="0" Grid.Row="1"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="#0D1117">
+            <Canvas x:Name="TechCanvas" Width="2000" Height="1500" Background="Transparent">
+
+                <!-- Connection lines (blue, behind nodes) -->
+                <ItemsControl ItemsSource="{Binding Connections}" Canvas.Top="0" Canvas.Left="0"
+                              IsHitTestVisible="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas Width="2000" Height="1500"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Line X1="{Binding X1}" Y1="{Binding Y1}" X2="{Binding X2}" Y2="{Binding Y2}"
+                                  Stroke="#44AAFF" StrokeThickness="2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Tech nodes -->
+                <ItemsControl ItemsSource="{Binding Technologies}" Canvas.Top="0" Canvas.Left="0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas Width="2000" Height="1500"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding X, Converter={StaticResource GridConv}}"/>
+                            <Setter Property="Canvas.Top"  Value="{Binding Y, Converter={StaticResource GridConv}}"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Width="88" Height="80" Padding="0"
+                                    Command="{Binding DataContext.SelectTechCommand,
+                                              RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}"
+                                    ToolTip="{Binding Id}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                                        <Setter Property="Background" Value="#1E2A3A"/>
+                                        <Setter Property="BorderBrush" Value="#335577"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Background" Value="#1A3A5C"/>
+                                                <Setter Property="BorderBrush" Value="#44AAFF"/>
+                                                <Setter Property="BorderThickness" Value="2"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Border CornerRadius="6" BorderBrush="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=BorderBrush}"
+                                        BorderThickness="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=BorderThickness}"
+                                        Background="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Background}"
+                                        Padding="4">
+                                    <StackPanel>
+                                        <materialDesign:PackIcon Kind="Flask" Width="24" Height="24"
+                                                                 HorizontalAlignment="Center"
+                                                                 Foreground="#44AAFF" Margin="0,4,0,2"/>
+                                        <TextBlock Text="{Binding Name}" FontSize="10" FontWeight="Medium"
+                                                   TextAlignment="Center" TextWrapping="Wrap" MaxHeight="32"
+                                                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                        <TextBlock Text="{Binding StartYear}" FontSize="9" Opacity="0.5"
+                                                   TextAlignment="Center"
+                                                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Canvas>
+        </ScrollViewer>
+
+        <!-- ── Right Panel ── -->
+        <Border Grid.Column="1" Grid.Row="1"
+                BorderBrush="#14FFFFFF" BorderThickness="1,0,0,0" Background="#0C0D12">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12,14,12,14">
+
+                    <!-- Empty state -->
+                    <StackPanel HorizontalAlignment="Center" Margin="0,48,0,0">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedTech}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <materialDesign:PackIcon Kind="Flask" Width="40" Height="40"
+                                                 Opacity="0.1" HorizontalAlignment="Center" Foreground="White"/>
+                        <TextBlock Text="Select a technology" FontSize="12" Opacity="0.25"
+                                   HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="White"/>
+                    </StackPanel>
+
+                    <StackPanel DataContext="{Binding SelectedTech}">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <materialDesign:PackIcon Kind="TuneVariant" Width="14" Height="14"
+                                                     Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                            <TextBlock Text="Tech Properties" Style="{StaticResource SectionLabel}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Tech ID" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="tech_id" materialDesign:HintAssist.IsFloating="False"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" FontSize="11"/>
+
+                        <TextBlock Text="Display Name" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="Technology Name" materialDesign:HintAssist.IsFloating="False"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" FontSize="11"/>
+
+                        <TextBlock Text="Description" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="Description text…"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" Height="52" TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto" Margin="0,0,0,8" FontSize="11"/>
+
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Research Cost" Style="{StaticResource InputLabel}"/>
+                                <TextBox materialDesign:HintAssist.Hint="1.0" materialDesign:HintAssist.IsFloating="False"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Text="{Binding ResearchCost, UpdateSourceTrigger=PropertyChanged}"
+                                         Height="32" VerticalContentAlignment="Center" FontSize="11"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Start Year" Style="{StaticResource InputLabel}"/>
+                                <TextBox materialDesign:HintAssist.Hint="1936" materialDesign:HintAssist.IsFloating="False"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Text="{Binding StartYear, UpdateSourceTrigger=PropertyChanged}"
+                                         Height="32" VerticalContentAlignment="Center" FontSize="11"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Folder (tree layout group)" Style="{StaticResource InputLabel}"/>
+                        <TextBox materialDesign:HintAssist.Hint="infantry_folder" materialDesign:HintAssist.IsFloating="False"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding Folder, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12" Height="32" VerticalContentAlignment="Center" FontSize="11"/>
+
+                        <!-- Prerequisites -->
+                        <Border Background="#0A6366F1" CornerRadius="6" Padding="10,8" Margin="0,0,0,10">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <materialDesign:PackIcon Kind="ArrowRight" Width="12" Height="12"
+                                                             Foreground="#44AAFF" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <TextBlock Text="Prerequisites" FontSize="10" FontWeight="SemiBold" Foreground="#44AAFF"/>
+                                </StackPanel>
+                                <ItemsControl ItemsSource="{Binding Prerequisites}" Margin="0,0,0,4">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding}" FontSize="11"
+                                                           VerticalAlignment="Center" Foreground="#44AAFF"/>
+                                                <Button Grid.Column="1" Style="{StaticResource GhostIconBtn}"
+                                                        Width="18" Height="18" Padding="0" Opacity="0.5"
+                                                        Command="{Binding DataContext.RemovePrerequisiteCommand,
+                                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}">
+                                                    <materialDesign:PackIcon Kind="Close" Width="10" Height="10"/>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="PrereqInput" Grid.Column="0"
+                                             materialDesign:HintAssist.Hint="Add prerequisite ID"
+                                             materialDesign:HintAssist.IsFloating="False"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                             Height="28" VerticalContentAlignment="Center" FontSize="10"/>
+                                    <Button Grid.Column="1" Style="{StaticResource GhostIconBtn}"
+                                            Width="28" Height="28" Margin="3,0,0,0"
+                                            Command="{Binding DataContext.AddPrerequisiteCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding Text, ElementName=PrereqInput}">
+                                        <materialDesign:PackIcon Kind="Plus" Width="12" Height="12"/>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Bonuses -->
+                        <Border Background="#0AF59E0B" CornerRadius="6" Padding="10,8">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="TuneVariant" Width="12" Height="12"
+                                                                 Foreground="#F59E0B" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                        <TextBlock Text="Research Bonuses" FontSize="10" FontWeight="SemiBold" Foreground="#F59E0B"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Style="{StaticResource GhostIconBtn}"
+                                            Width="22" Height="22" Padding="0" Opacity="0.6"
+                                            Command="{Binding DataContext.AddBonusCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                        <materialDesign:PackIcon Kind="Plus" Width="11" Height="11"/>
+                                    </Button>
+                                </Grid>
+                                <ItemsControl ItemsSource="{Binding Bonuses}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="6"/>
+                                                    <ColumnDefinition Width="72"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox Grid.Column="0"
+                                                         materialDesign:HintAssist.Hint="modifier_key"
+                                                         materialDesign:HintAssist.IsFloating="False"
+                                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                         Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}"
+                                                         Height="28" VerticalContentAlignment="Center" FontSize="10"/>
+                                                <TextBox Grid.Column="2"
+                                                         materialDesign:HintAssist.Hint="0.1"
+                                                         materialDesign:HintAssist.IsFloating="False"
+                                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                         Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                                         Height="28" VerticalContentAlignment="Center" FontSize="10"/>
+                                                <Button Grid.Column="3" Style="{StaticResource GhostIconBtn}"
+                                                        Width="22" Height="22" Padding="0" Margin="3,0,0,0" Opacity="0.5"
+                                                        Command="{Binding DataContext.RemoveBonusCommand,
+                                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}">
+                                                    <materialDesign:PackIcon Kind="Close" Width="10" Height="10" Foreground="#EF4444"/>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

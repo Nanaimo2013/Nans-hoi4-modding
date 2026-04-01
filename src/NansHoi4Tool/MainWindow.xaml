@@ -1,0 +1,334 @@
+﻿<controls:MetroWindow x:Class="NansHoi4Tool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:helpers="clr-namespace:NansHoi4Tool.Helpers"
+        xmlns:customControls="clr-namespace:NansHoi4Tool.Controls"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}"
+        Height="800" Width="1320"
+        MinHeight="600" MinWidth="920"
+        WindowStartupLocation="CenterScreen"
+        GlowBrush="#6366F1"
+        BorderThickness="1"
+        TextElement.Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+        Background="#0D0E14">
+
+    <controls:MetroWindow.InputBindings>
+        <KeyBinding Key="S" Modifiers="Ctrl"       Command="{Binding SaveProjectCommand}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveProjectAsCommand}"/>
+        <KeyBinding Key="E" Modifiers="Ctrl+Shift" Command="{Binding ExportModCommand}"/>
+        <KeyBinding Key="N" Modifiers="Ctrl"       Command="{Binding NewProjectCommand}"/>
+        <KeyBinding Key="O" Modifiers="Ctrl"       Command="{Binding OpenProjectCommand}"/>
+    </controls:MetroWindow.InputBindings>
+
+    <!-- ══ Menu bar ═══════════════════════════════════════════════════════ -->
+    <controls:MetroWindow.LeftWindowCommands>
+        <controls:WindowCommands>
+            <Menu Background="Transparent" Foreground="White" FontSize="12" VerticalAlignment="Center">
+                <MenuItem Header="File">
+                    <MenuItem Header="_New Project"       Command="{Binding NewProjectCommand}"    InputGestureText="Ctrl+N"/>
+                    <MenuItem Header="_Open Project..."   Command="{Binding OpenProjectCommand}"   InputGestureText="Ctrl+O"/>
+                    <MenuItem Header="_Save"              Command="{Binding SaveProjectCommand}"   InputGestureText="Ctrl+S"/>
+                    <MenuItem Header="Save _As..."        Command="{Binding SaveProjectAsCommand}" InputGestureText="Ctrl+Shift+S"/>
+                    <Separator/>
+                    <MenuItem Header="E_xport to HOI4..." Command="{Binding ExportModCommand}"    InputGestureText="Ctrl+Shift+E"/>
+                    <Separator/>
+                    <MenuItem Header="Close Project"      Command="{Binding CloseProjectCommand}"/>
+                </MenuItem>
+                <MenuItem Header="View">
+                    <MenuItem Header="Toggle Sidebar"  Command="{Binding ToggleSidebarCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="Dashboard"       Command="{Binding NavigateCommand}" CommandParameter="Dashboard"/>
+                    <MenuItem Header="Focus Trees"     Command="{Binding NavigateCommand}" CommandParameter="FocusTree"/>
+                    <MenuItem Header="Country"         Command="{Binding NavigateCommand}" CommandParameter="Country"/>
+                    <MenuItem Header="Events"          Command="{Binding NavigateCommand}" CommandParameter="Events"/>
+                    <MenuItem Header="Technologies"    Command="{Binding NavigateCommand}" CommandParameter="Technologies"/>
+                </MenuItem>
+                <MenuItem Header="Project">
+                    <MenuItem Header="Version History" Command="{Binding NavigateCommand}" CommandParameter="VersionHistory"/>
+                    <MenuItem Header="Collaboration"   Command="{Binding NavigateCommand}" CommandParameter="Collaboration"/>
+                    <MenuItem Header="Check for Updates" Command="{Binding NavigateCommand}" CommandParameter="Update"/>
+                    <MenuItem Header="Settings"        Command="{Binding NavigateCommand}" CommandParameter="Settings"/>
+                </MenuItem>
+                <MenuItem Header="Help">
+                    <MenuItem Header="Help &amp; Shortcuts" Command="{Binding NavigateCommand}" CommandParameter="Help"/>
+                </MenuItem>
+            </Menu>
+        </controls:WindowCommands>
+    </controls:MetroWindow.LeftWindowCommands>
+
+    <controls:MetroWindow.Resources>
+        <helpers:BoolToWidthConverter x:Key="SidebarWidthConv" ExpandedWidth="224" CollapsedWidth="56"/>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <helpers:BoolToVisibilityConverter x:Key="InvBoolToVis" Invert="True"/>
+        <helpers:PageKeyToSelectedConverter x:Key="PageToSelected"/>
+    </controls:MetroWindow.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+        <Border Grid.Column="0"
+                Width="{Binding SidebarExpanded, Converter={StaticResource SidebarWidthConv}}"
+                Background="#0A0B10"
+                BorderBrush="#16FFFFFF"
+                BorderThickness="0,0,1,0">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Logo + hamburger -->
+                <Border Grid.Row="0" Padding="0,12,0,10" BorderBrush="#16FFFFFF" BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- Logo (collapsed = just sword icon centred) -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="14,0,0,0"
+                                    Visibility="{Binding SidebarExpanded, Converter={StaticResource BoolToVis}}">
+                            <Border Width="30" Height="30" CornerRadius="8" Background="#1A1C27"
+                                    BorderBrush="#2C2F43" BorderThickness="1" Margin="0,0,10,0">
+                                <materialDesign:PackIcon Kind="Sword" Width="16" Height="16"
+                                                         Foreground="#6366F1"
+                                                         HorizontalAlignment="Center"
+                                                         VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Nan's Hoi4 Tool" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="White"/>
+                                <TextBlock Text="Mod Editor" FontSize="9" Opacity="0.35"
+                                           Foreground="White"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <!-- Hamburger -->
+                        <Button Grid.Column="1" Style="{StaticResource GhostIconBtn}"
+                                Width="32" Height="32" Margin="0,0,8,0"
+                                Command="{Binding ToggleSidebarCommand}"
+                                ToolTip="Toggle Sidebar" Opacity="0.6">
+                            <materialDesign:PackIcon Kind="Menu" Width="18" Height="18"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Nav items -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+                    <StackPanel Margin="0,10,0,6">
+
+                        <customControls:NavButton PageKey="Dashboard" Label="Dashboard" Icon="ViewDashboard"
+                                         CurrentPage="{Binding CurrentPageKey}"
+                                         NavCommand="{Binding NavigateCommand}"
+                                         IsExpanded="{Binding SidebarExpanded}"/>
+
+                        <!-- EDITORS group -->
+                        <Border Height="1" Background="#0EFFFFFF" Margin="10,8,10,6"/>
+                        <TextBlock Text="EDITORS" FontSize="9" FontWeight="Bold"
+                                   Opacity="0.3" Margin="16,0,0,4"
+                                   Foreground="White"
+                                   Visibility="{Binding SidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+
+                        <customControls:NavButton PageKey="FocusTree"    Label="Focus Trees"       Icon="FileTreeOutline"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                        <customControls:NavButton PageKey="Events"       Label="Events"            Icon="CalendarText"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                        <customControls:NavButton PageKey="Ideas"        Label="National Spirits"  Icon="ShieldStar"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                        <customControls:NavButton PageKey="Technologies" Label="Technologies"      Icon="Microscope"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                        <customControls:NavButton PageKey="Decisions"    Label="Decisions"         Icon="ClipboardList"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                        <customControls:NavButton PageKey="Country"      Label="Country"           Icon="Flag"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                        <customControls:NavButton PageKey="Localisation" Label="Localisation"      Icon="Translate"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                        <customControls:NavButton PageKey="Units"        Label="Units &amp; Equip" Icon="TankOutline"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+
+                        <!-- PROJECT group -->
+                        <Border Height="1" Background="#0EFFFFFF" Margin="10,8,10,6"/>
+                        <TextBlock Text="PROJECT" FontSize="9" FontWeight="Bold"
+                                   Opacity="0.3" Margin="16,0,0,4"
+                                   Foreground="White"
+                                   Visibility="{Binding SidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+
+                        <customControls:NavButton PageKey="VersionHistory" Label="Version History" Icon="History"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                        <customControls:NavButton PageKey="Collaboration"  Label="Collaboration"   Icon="AccountMultiple"
+                                         CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Bottom: Help / Update / Settings / User -->
+                <StackPanel Grid.Row="2" Margin="0,0,0,6">
+                    <Border Height="1" Background="#0EFFFFFF" Margin="10,4,10,6"/>
+
+                    <customControls:NavButton PageKey="Update"   Label="Updates"   Icon="CloudDownloadOutline"
+                                     CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                    <customControls:NavButton PageKey="Help"     Label="Help"      Icon="HelpCircleOutline"
+                                     CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+                    <customControls:NavButton PageKey="Settings" Label="Settings"  Icon="Cog"
+                                     CurrentPage="{Binding CurrentPageKey}" NavCommand="{Binding NavigateCommand}" IsExpanded="{Binding SidebarExpanded}"/>
+
+                    <!-- User chip (expanded only) -->
+                    <Border Margin="8,8,8,2" CornerRadius="8" Background="#10FFFFFF"
+                            BorderBrush="#14FFFFFF" BorderThickness="1"
+                            Padding="10,7"
+                            Visibility="{Binding SidebarExpanded, Converter={StaticResource BoolToVis}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="24" Height="24" CornerRadius="12" Background="#6366F1"
+                                    Margin="0,0,8,0">
+                                <materialDesign:PackIcon Kind="AccountOutline" Width="14" Height="14"
+                                                         Foreground="White"
+                                                         HorizontalAlignment="Center"
+                                                         VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding UserName}" FontSize="11" FontWeight="Medium"
+                                           Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding VersionDisplay}" FontSize="9"
+                                           Foreground="White" Opacity="0.35"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Project toolbar -->
+            <Border Grid.Row="0" Background="#0F1018"
+                    BorderBrush="#16FFFFFF" BorderThickness="0,0,0,1"
+                    Padding="14,7"
+                    Visibility="{Binding HasActiveProject, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="6" Height="6" CornerRadius="3" Background="#22C55E" Margin="0,0,10,0">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="6" ShadowDepth="0" Opacity="0.9" Color="#22C55E"/>
+                            </Border.Effect>
+                        </Border>
+                        <materialDesign:PackIcon Kind="FolderOpenOutline" Width="15" Height="15"
+                                                 Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding ActiveProjectName}"
+                                   FontSize="13" FontWeight="Medium" VerticalAlignment="Center"
+                                   Foreground="White"/>
+                        <Border Style="{StaticResource PillAccent}" Margin="10,0,0,0" Padding="7,2">
+                            <TextBlock Text="OPEN" FontSize="9" FontWeight="Bold" Foreground="#818CF8"/>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <Button Style="{StaticResource GhostIconBtn}" Padding="12,6" Margin="0,0,4,0"
+                                Command="{Binding SaveProjectCommand}" ToolTip="Save (Ctrl+S)"
+                                Height="30" Opacity="0.75">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ContentSave" Width="14" Height="14"
+                                                         VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Save" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource GlowButton}" Padding="12,6" Margin="0,0,6,0"
+                                Command="{Binding ExportModCommand}" Height="30"
+                                ToolTip="Export to HOI4 mod folder (Ctrl+Shift+E)">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Export" Width="14" Height="14"
+                                                         VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Export" VerticalAlignment="Center" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource GhostIconBtn}" Width="28" Height="28"
+                                Command="{Binding CloseProjectCommand}" ToolTip="Close project" Opacity="0.4">
+                            <materialDesign:PackIcon Kind="Close" Width="13" Height="13"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Page content -->
+            <Border Grid.Row="1" x:Name="ContentBorder" ClipToBounds="True"
+                    Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+                <ContentControl x:Name="MainContent"/>
+            </Border>
+
+            <!-- Status bar -->
+            <Border Grid.Row="2" Background="#070810" Height="24">
+                <Border.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#6366F1" Offset="0"/>
+                        <GradientStop Color="#818CF8" Offset="0.5"/>
+                        <GradientStop Color="#6366F1" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.BorderBrush>
+                <Border.BorderThickness>0,1,0,0</Border.BorderThickness>
+                <Grid Margin="14,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding StatusText}"
+                               FontSize="10" VerticalAlignment="Center"
+                               Foreground="White" Opacity="0.6"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <TextBlock Text="{Binding VersionDisplay}"
+                                   FontSize="10" VerticalAlignment="Center"
+                                   Foreground="White" Opacity="0.3" Margin="0,0,12,0"/>
+                        <TextBlock Text="Nanaimo_2013"
+                                   FontSize="10" VerticalAlignment="Center"
+                                   Foreground="#6366F1" Opacity="0.6"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Global busy overlay -->
+        <Border Grid.Column="1" Panel.ZIndex="998" IsHitTestVisible="True"
+                Background="#A0000000"
+                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Width="72" Height="72" CornerRadius="16" Background="#1A1C27"
+                        BorderBrush="#2C2F43" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="24" ShadowDepth="0" Opacity="0.5" Color="#6366F1"/>
+                    </Border.Effect>
+                    <controls:ProgressRing IsActive="True" Width="40" Height="40" Foreground="#6366F1"/>
+                </Border>
+                <TextBlock Text="Please wait…" Foreground="White" FontSize="12" Opacity="0.5"
+                           Margin="0,14,0,0" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Notification overlay -->
+        <customControls:NotificationOverlay x:Name="NotifOverlay" Grid.Column="1"
+                                             IsHitTestVisible="True"
+                                             VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                                             Margin="0,0,18,30" Panel.ZIndex="999"/>
+    </Grid>
+</controls:MetroWindow>

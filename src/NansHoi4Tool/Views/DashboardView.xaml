@@ -1,0 +1,282 @@
+<UserControl x:Class="NansHoi4Tool.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:NansHoi4Tool.Helpers"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <helpers:BoolToVisibilityConverter x:Key="InvBoolToVis" Invert="True"/>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+
+            <!-- ══ Hero banner ══════════════════════════════════════════════ -->
+            <Border MinHeight="200" ClipToBounds="True">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#0F1016" Offset="0"/>
+                        <GradientStop Color="#1A1040" Offset="0.45"/>
+                        <GradientStop Color="#0D1A2E" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <Grid>
+                    <!-- Glow orbs -->
+                    <Ellipse Width="380" Height="260" HorizontalAlignment="Left" VerticalAlignment="Center"
+                             Margin="-60,-40,0,0" Opacity="0.06">
+                        <Ellipse.Fill>
+                            <RadialGradientBrush>
+                                <GradientStop Color="#6366F1" Offset="0"/>
+                                <GradientStop Color="Transparent" Offset="1"/>
+                            </RadialGradientBrush>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <Ellipse Width="280" Height="200" HorizontalAlignment="Right" VerticalAlignment="Center"
+                             Margin="0,0,-40,0" Opacity="0.05">
+                        <Ellipse.Fill>
+                            <RadialGradientBrush>
+                                <GradientStop Color="#22C55E" Offset="0"/>
+                                <GradientStop Color="Transparent" Offset="1"/>
+                            </RadialGradientBrush>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                    <Grid Margin="44,34,44,30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left: greeting + actions -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Greeting}"
+                                       FontSize="32" FontWeight="Light" Foreground="White"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="Hearts of Iron IV Mod Editor"
+                                       FontSize="13" Foreground="White" Opacity="0.45"
+                                       Margin="0,0,0,22"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{StaticResource GlowButton}"
+                                        Padding="20,10" Margin="0,0,10,0"
+                                        Command="{Binding NewProjectCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Plus" VerticalAlignment="Center"
+                                                                 Margin="0,0,7,0" Width="15" Height="15"/>
+                                        <TextBlock Text="New Project" VerticalAlignment="Center" FontSize="13"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        materialDesign:ButtonAssist.CornerRadius="8"
+                                        BorderBrush="#40FFFFFF" Foreground="White"
+                                        Padding="18,10" Margin="0,0,10,0"
+                                        Command="{Binding OpenProjectCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FolderOpen" VerticalAlignment="Center"
+                                                                 Margin="0,0,7,0" Width="15" Height="15"/>
+                                        <TextBlock Text="Open" VerticalAlignment="Center" FontSize="13"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                        materialDesign:ButtonAssist.CornerRadius="8"
+                                        Foreground="#90FFFFFF"
+                                        Padding="16,10"
+                                        Command="{Binding ImportModCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Import" VerticalAlignment="Center"
+                                                                 Margin="0,0,7,0" Width="15" Height="15"/>
+                                        <TextBlock Text="Import Mod" VerticalAlignment="Center" FontSize="13"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Right: decorative -->
+                        <Grid Grid.Column="1" VerticalAlignment="Center" Margin="0,0,8,0">
+                            <Ellipse Width="90" Height="90" Opacity="0.06">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush>
+                                        <GradientStop Color="#6366F1" Offset="0"/>
+                                        <GradientStop Color="Transparent" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <materialDesign:PackIcon Kind="Sword" Width="88" Height="88"
+                                                     Foreground="White" Opacity="0.07"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ══ Recent Projects ═════════════════════════════════════════ -->
+            <StackPanel Margin="44,30,44,40">
+
+                <!-- Section header -->
+                <Grid Margin="0,0,0,18">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="History" Width="16" Height="16"
+                                                 Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                                 VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Recent Projects" Style="{StaticResource HeadingMd}" Margin="0"/>
+                    </StackPanel>
+                    <Border Grid.Column="1" Style="{StaticResource PillAccent}" Padding="8,3"
+                            Visibility="{Binding RecentProjects.Count, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Text="{Binding RecentProjects.Count, StringFormat='{}{0} project(s)'}"
+                                   FontSize="10" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Border>
+                </Grid>
+
+                <!-- Project cards grid -->
+                <ItemsControl ItemsSource="{Binding RecentProjects}">
+                    <ItemsControl.Style>
+                        <Style TargetType="ItemsControl">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RecentProjects.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Style>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="260" Height="160" Margin="0,0,16,16"
+                                    CornerRadius="12" Cursor="Hand" ClipToBounds="True"
+                                    Background="#13151F" BorderBrush="#22243A" BorderThickness="1">
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding DataContext.OpenRecentProjectCommand,
+                                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                  CommandParameter="{Binding Path}"/>
+                                </Border.InputBindings>
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#1C1E2C"/>
+                                                <Setter Property="BorderBrush" Value="#4F46E5"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+
+                                <Grid>
+                                    <!-- Top accent -->
+                                    <Border Height="3" VerticalAlignment="Top" CornerRadius="12,12,0,0">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#6366F1" Offset="0"/>
+                                                <GradientStop Color="#818CF8" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+
+                                    <Grid Margin="16,14,12,14">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <materialDesign:PackIcon Grid.Row="0" Grid.Column="0"
+                                                                 Kind="FileDocumentOutline"
+                                                                 Width="38" Height="38"
+                                                                 Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                                                 Opacity="0.8" VerticalAlignment="Top"/>
+                                        <Button Grid.Row="0" Grid.Column="1"
+                                                Style="{StaticResource GhostIconBtn}"
+                                                Width="26" Height="26"
+                                                VerticalAlignment="Top" HorizontalAlignment="Right"
+                                                ToolTip="Pin project"
+                                                Command="{Binding DataContext.PinProjectCommand,
+                                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding Path}">
+                                            <materialDesign:PackIcon Kind="Pin" Width="13" Height="13"/>
+                                        </Button>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                                   Text="{Binding Name}"
+                                                   FontSize="14" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                                   Margin="0,0,0,4"/>
+
+                                        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                    Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="ClockOutline"
+                                                                     Width="11" Height="11"
+                                                                     VerticalAlignment="Center"
+                                                                     Opacity="0.35" Margin="0,0,4,0"
+                                                                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                            <TextBlock Text="{Binding LastEdited}"
+                                                       FontSize="11" Opacity="0.4"
+                                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Empty state -->
+                <Border Padding="48,40" HorizontalAlignment="Center" MinWidth="420">
+                    <Border.Style>
+                        <Style TargetType="Border" BasedOn="{StaticResource AppCard}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RecentProjects.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel HorizontalAlignment="Center">
+                        <materialDesign:PackIcon Kind="FolderPlusOutline" Width="64" Height="64"
+                                                 Opacity="0.15" HorizontalAlignment="Center"
+                                                 Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        <TextBlock Text="No recent projects" FontSize="18" FontWeight="Light" Opacity="0.35"
+                                   HorizontalAlignment="Center" Margin="0,16,0,6"
+                                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                        <TextBlock Text="Create or open a project to get started"
+                                   FontSize="12" Opacity="0.22" HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                        <Button Style="{StaticResource GlowButton}" HorizontalAlignment="Center"
+                                Padding="20,10" Margin="0,20,0,0"
+                                Command="{Binding NewProjectCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Plus" Width="14" Height="14"
+                                                         VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="Create your first project" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
