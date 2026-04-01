@@ -10,7 +10,7 @@ public static class AppVersion
     public static string Current => _cached ??=
         Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion ?? "1.0.0";
+                ?.InformationalVersion ?? "0.0.2";
 
     public static string Display => $"v{Current}";
 

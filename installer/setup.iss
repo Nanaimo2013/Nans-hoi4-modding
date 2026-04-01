@@ -4,12 +4,13 @@
 ; ═══════════════════════════════════════════════════════════════════════════════
 
 #define AppName        "Nan's Hoi4 Tool"
-#define AppVersion     "1.0.0"
+#define AppVersion     "0.0.2"
 #define AppPublisher   "Nanaimo_2013"
 #define AppURL         "https://github.com/Nanaimo2013/Nans-hoi4-modding"
 #define AppExeName     "NansHoi4Tool.exe"
 #define AppId          "{{A3F8C2D1-44B7-4E9A-B6F2-1D8E3C5A7B90}"
 #define BuildDir       "..\src\NansHoi4Tool\bin\Release\net8.0-windows"
+#define ServerBuildDir "..\src\NansHoi4Tool.Server\bin\Release\net8.0"
 
 [Setup]
 AppId={#AppId}
@@ -54,13 +55,14 @@ Name: "associate";     Description: "&Associate .hoi4mod files with {#AppName}";
 ; Main application
 Source: "{#BuildDir}\{#AppExeName}";           DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\NansHoi4Tool.dll";        DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildDir}\NansHoi4Tool.Server.exe"; DestDir: "{app}"; Flags: ignoreversion; Check: ServerExists
+Source: "{#ServerBuildDir}\NansHoi4Tool.Server.exe"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#BuildDir}\*.dll";                   DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 Source: "{#BuildDir}\*.json";                  DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\*.pdb";                   DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; Resources
 Source: "{#BuildDir}\Resources\*";             DestDir: "{app}\Resources"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: ResourcesExist
 ; Runtimes (if self-contained publish is used)
+Source: "{#BuildDir}\Themes\*";                 DestDir: "{app}\Themes"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#BuildDir}\runtimes\*";              DestDir: "{app}\runtimes"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: RuntimesExist
 
 [Icons]
@@ -88,7 +90,7 @@ Filename: "taskkill"; Parameters: "/f /im {#AppExeName}"; Flags: runhidden
 [Code]
 function ServerExists: Boolean;
 begin
-  Result := FileExists(ExpandConstant('{#BuildDir}\NansHoi4Tool.Server.exe'));
+  Result := FileExists(ExpandConstant('{#ServerBuildDir}\NansHoi4Tool.Server.exe'));
 end;
 
 function ResourcesExist: Boolean;
